@@ -6,6 +6,27 @@ class Analyser:
     def __init__(self, results: pd.DataFrame):
         self.results = results.copy()
 
+    def print_summary(self):
+        r = self.results
+        import_before = r["grid_import"].sum()
+        import_after = r["grid_import_after_battery"].sum()
+        export_before = r["grid_export"].sum()
+        export_after = r["grid_export_after_battery"].sum()
+        charged = r["battery_charged_kwh"].sum()
+        discharged = r["battery_discharged_kwh"].sum()
+        reduction = import_before - import_after
+        reduction_pct = reduction / import_before * 100 if import_before > 0 else 0.0
+
+        print(f"Zeitraum:              {r.index.min()} bis {r.index.max()}")
+        print(f"Netzbezug vorher:      {import_before:10.1f} kWh")
+        print(f"Netzbezug nachher:     {import_after:10.1f} kWh")
+        print(f"Reduktion Netzbezug:   {reduction:10.1f} kWh ({reduction_pct:.1f} %)")
+        print(f"Einspeisung vorher:    {export_before:10.1f} kWh")
+        print(f"Einspeisung nachher:   {export_after:10.1f} kWh")
+        print(f"Batterie geladen:      {charged:10.1f} kWh")
+        print(f"Batterie entladen:     {discharged:10.1f} kWh")
+        print(f"Verluste + SOC-Delta:  {charged - discharged:10.1f} kWh")
+
     def plot_all(self):
         fig, axes = plt.subplots(
             nrows=4,

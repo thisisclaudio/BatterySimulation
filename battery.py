@@ -99,10 +99,13 @@ class Battery:
         available_energy_kwh = (self.capacity_kwh * (self.soc - self.min_soc))
 
         output_kwh = power_w * duration_h / 1000
-        delivered_kwh = min(output_kwh / self.efficiency_discharging, available_energy_kwh)
+        drawn_kwh = min(output_kwh / self.efficiency_discharging, available_energy_kwh)
+
+        # Energy that actually reaches the house after discharge losses
+        delivered_kwh = drawn_kwh * self.efficiency_discharging
 
         #Calc new SoC
-        self.soc = self.soc - delivered_kwh / self.capacity_kwh
+        self.soc = self.soc - drawn_kwh / self.capacity_kwh
 
         return delivered_kwh
 

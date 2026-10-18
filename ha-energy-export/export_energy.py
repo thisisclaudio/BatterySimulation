@@ -4,6 +4,7 @@ import csv
 import json
 import os
 from datetime import datetime
+from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import websockets
@@ -89,14 +90,25 @@ async def main():
             if not (START <= timestamp < END):
                 continue
 
-            key = timestamp.strftime("%Y-%m-%d %H:%M:%S")
-            row = rows.setdefault(key, {"Zeit": key})
+            # Zeit mit UTC-Offset, damit die doppelte Stunde bei der
+            # Zeitumstellung im Oktober nicht überschrieben wird
+            # (Schlüssel in UTC: lokale Zeiten der doppelten Stunde gelten
+            # in Python als gleich)
+            row = rows.setdefault(
+                entry["start"],
+                {"Zeit": timestamp.isoformat(sep=" ")},
+            )
 
             # Energieänderung während der Stunde, in kWh
             row[column] = entry.get("change")
 
     # CSV mit allen Stunden schreiben
-    output_file = "energiedaten_2026-01-01_bis_2026-08-01.csv"
+    output_dir = Path(__file__).resolve().parent.parent / "data"
+    output_dir.mkdir(exist_ok=True)
+    output_file = (
+        output_dir
+        / f"energiedaten_{START:%Y-%m-%d}_bis_{END:%Y-%m-%d}.csv"
+    )
     columns = ["Zeit", *SENSORS.keys()]
 
     with open(output_file, "w", newline="", encoding="utf-8-sig") as file:
