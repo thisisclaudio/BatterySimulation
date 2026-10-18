@@ -32,7 +32,7 @@ or come from the grid.
 Python 3.9 or newer.
 
 ```
-pip install pandas matplotlib websockets python-dotenv
+pip install -r requirements.txt
 ```
 
 ## Getting the data
@@ -89,6 +89,37 @@ Reduktion Netzbezug:       1828.0 kWh (44.0 %)
 ```
 
 To compare battery sizes, just change `capacity_kwh` and run it again.
+
+## Comparing batteries in the web tool
+
+There's also a small web app to compare several batteries side by side:
+
+```
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+It opens in the browser. You can enter up to 8 batteries in a table
+(capacity, power, efficiency, SOC limits and optionally the price from an
+offer), and set electricity prices and battery lifetime in the sidebar.
+
+What you get:
+
+- a short verdict which battery is the best value, plus a card per battery
+  with import saved, savings per year and payback time
+- a size curve that runs every capacity from 0 up to e.g. 30 kWh, so you can
+  see where more capacity stops paying off
+- grid import per month and an average day, before and after
+- state of charge over a chosen week, and a heatmap of the whole period
+- a table with all numbers, downloadable as CSV
+
+The money part is simple: savings = avoided import × import price minus the
+feed-in income you lose. Yearly values are scaled up from the data period, so
+with data from January to July only, the yearly numbers are a guess. The
+default prices and battery costs are placeholders, put in your own.
+
+The logic behind the app lives in `comparison.py` and can be used from Python
+directly as well.
 
 ## Limitations
 
