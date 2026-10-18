@@ -16,13 +16,12 @@ battery = Battery(
     max_discharging_power_w=5000,
     min_soc=0.10,
     max_soc=0.90,
-    initial_soc=0.90,
+    initial_soc=0.10,  # start empty so stored energy isn't counted as savings
 )
 
 simulation = Simulation(battery=battery, data=data)
 results = simulation.run()
 
-print(results.head(n=20))
-
 analyser = Analyser(results)
+analyser.print_summary()
 analyser.plot_all()
